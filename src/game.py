@@ -1,32 +1,40 @@
 import pygame
-from pygame.locals import *
 import sys
-import neural
+from pygame.locals import *
+from neural import NeuralNetwork
 from snake import Snake, Direction
-
-
-MAX_FPS = 60
-BG_COLOR = pygame.Color('#575757')
-BOARD_COLOR = pygame.Color('#FFFFFF')
+from genetic import newGeneration
+from settings import *
 
 
 def initWindow():
-    pygame.display.set_caption("Snake")
-    return pygame.display.set_mode((600, 600))
+    pygame.display.set_caption("SnakeAI")
+    return pygame.display.set_mode((2 * MARGIN_SIDES + BOARD_SIZE, MARGIN_TOP + MARGIN_DOWN + BOARD_SIZE))
 
 
-def initSnake(window):
-    return Snake(window)
+def updateInfo(generation):
+    print(f"\nNew generation: {generation}")
+
+
+def drawWindow(window, alive):
+    window.fill(pygame.Color(BG_COLOR))
+    pygame.draw.rect(window, pygame.Color(BOARD_COLOR),
+                     (BOARD_LEFT, BOARD_TOP, BOARD_SIZE, BOARD_SIZE))
+    alive.draw(window)
+    pygame.display.update()
 
 
 def main():
     pygame.init()
     window = initWindow()
     fps_timer = pygame.time.Clock()
-    snake = initSnake(window)
+    snakes = newGeneration()
+    max_fps = 60
+    generation = 1
+    draw = True
+    updateInfo(generation)
 
     while True:
-
         # controls
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -34,27 +42,37 @@ def main():
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_LEFT:
-                    snake.changeDir(Direction.LEFT)
+                    draw = True
                 elif event.key == K_RIGHT:
-                    snake.changeDir(Direction.RIGHT)
+                    draw = False
+                elif event.key == K_s:
+                    snakes[0].brain.saveWeighs()
                 elif event.key == K_UP:
-                    snake.changeDir(Direction.UP)
+                    max_fps = 60
                 elif event.key == K_DOWN:
-                    snake.changeDir(Direction.DOWN)
+                    max_fps = 1000
 
         # game action
-        if snake.move() == False:
-            pygame.quit()
+        alive = None
+        for snake in snakes:
+            if snake.active == True:
+                snake.think()
+                snake.move()
+            if snake.active == True and alive == None:
+                alive = snake
+
+        # new generation
+        if alive == None:
+            snakes = newGeneration(False, snakes)
+            updateInfo(generation)
+            generation += 1
+            continue
 
         # drawing
-        window.fill(BG_COLOR)
-        pygame.draw.rect(window, BOARD_COLOR,
-                         (60, 10, 480, 480))
-        snake.draw()
-        pygame.display.update()
+        if draw:
+            drawWindow(window, alive)
 
-        # print(fps_timer.get_fps())
-        fps_timer.tick(MAX_FPS)
+        fps_timer.tick(max_fps)
 
 
 if __name__ == "__main__":
