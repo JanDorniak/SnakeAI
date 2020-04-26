@@ -6,6 +6,7 @@ from settings import *
 from utils import *
 
 
+# element of snake
 class Element:
 
     def __init__(self, position, direction=None):
@@ -36,7 +37,7 @@ class Snake:
         self.ticks_alive = 0
         self.body = []
         self.body.append(Element((BOARD_LEFT + BOARD_SIZE//2,
-                                  BOARD_TOP + BOARD_SIZE//2), Direction.DOWN))
+                                  BOARD_TOP + BOARD_SIZE//2), Direction.UP))
         self.turns = []
         self.think_lock = 0
         # every snake has his own apple to collect
@@ -69,8 +70,12 @@ class Snake:
         self.body.append(Element((x, y), dir))
 
     def calcFitness(self):
-        self.fitness = self.ticks_alive * \
-            self.ticks_alive * np.power(2, self.apples_eaten)
+        if self.apples_eaten < 10:
+            self.fitness = int(self.ticks_alive * self.ticks_alive *
+                               np.power(2, self.apples_eaten))
+        else:
+            self.fitness = int(self.ticks_alive * self.ticks_alive *
+                               np.power(2, 10) * (self.apples_eaten - 9))
 
     def changeDir(self, dir):
         if dir.value == self.body[0].direction.value * (-1) or self.body[0].direction == dir:
@@ -98,7 +103,8 @@ class Snake:
 
         # check for collisions
         # with wall
-        if self.body[0].x < 60 + RADIUS or self.body[0].x > 540 - RADIUS or self.body[0].y > 490 - RADIUS or self.body[0].y < 10 + RADIUS:
+        if self.body[0].x < BOARD_LEFT + RADIUS or self.body[0].x > BOARD_RIGHT - RADIUS \
+                or self.body[0].y > BOARD_DOWN - RADIUS or self.body[0].y < BOARD_TOP + RADIUS:
             self.active = False
         # with body
         for element in self.body:
@@ -110,7 +116,7 @@ class Snake:
             self.placeApple()
             self.steps_without_apple = 0
 
-        if self.steps_without_apple > 15:
+        if self.steps_without_apple > 50:  # 15
             self.active = False
 
     def think(self):
@@ -128,7 +134,7 @@ class Snake:
         elif decision == 3:
             self.changeDir(Direction.RIGHT)
 
-        self.think_lock = 15
+        self.think_lock = 10  # 15
 
     def checkSide(self, line, condition1, condition2, dist_value, dir=None):
         inputs = [0] * 3
@@ -139,8 +145,11 @@ class Snake:
             for element in self.body:
                 if element != head and element.checkCollisionWithLine(line) and condition1(element):
                     inputs[0] = 1
+                    break
+
         inputs[1] = 1 * \
             (self.apple.checkCollisionWithLine(line) and condition2)
+
         if line[0] == None or line[0] == 0:
             inputs[2] = 1 / (abs(dist_value) + 0.01)
         else:

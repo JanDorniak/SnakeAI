@@ -12,17 +12,14 @@ def selectBest(snakes):
 
 def normalizeFitness(snakes):
     total = 0
-    avgscore = 0
     for snake in snakes:
-        avgscore += snake.apples_eaten
         snake.calcFitness()
         total += snake.fitness
 
     for snake in snakes:
         snake.fitness /= total
 
-    avgscore /= len(snakes)
-    print(f"Avg apples eaten: {avgscore}")
+    print(f"Avg fitness: {total/POPULATION}")
 
 
 def pickParent(snakes):
@@ -32,6 +29,7 @@ def pickParent(snakes):
         sum += snakes[i].fitness
         if r < sum:
             parent = snakes[i]
+            break
 
     return parent
 
@@ -60,4 +58,5 @@ def newGeneration(fromZero=True, snakes=None):
 
         for i in range(BEST_N, POPULATION):  # mutate snakes
             newSnakes[i].brain.mutate(MUTATION_CHANCE)
+
         return newSnakes

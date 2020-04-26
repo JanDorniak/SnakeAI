@@ -2,18 +2,18 @@ import pygame
 import sys
 from pygame.locals import *
 from neural import NeuralNetwork
-from snake import Snake, Direction
-from genetic import newGeneration
+from snake import Snake
+from genetic import *
 from settings import *
 
 
 def initWindow():
-    pygame.display.set_caption("SnakeAI")
     return pygame.display.set_mode((2 * MARGIN_SIDES + BOARD_SIZE, MARGIN_TOP + MARGIN_DOWN + BOARD_SIZE))
 
 
-def updateInfo(generation):
-    print(f"\nNew generation: {generation}")
+def updateInfo(generation, alive):
+    pygame.display.set_caption(
+        f"Generation {generation}, snakes alive {alive}")
 
 
 def drawWindow(window, alive):
@@ -24,15 +24,35 @@ def drawWindow(window, alive):
     pygame.display.update()
 
 
+def saveGeneration(snakes, generation):
+    f = open("models/generation.txt", "w")
+    f.write(f"{generation}")
+    f.close()
+    for i in range(0, POPULATION):
+        snakes[i].brain.saveWeighs(i)
+
+
+def loadGeneration():
+    f = open("models/generation.txt", "r")
+    generation = int(f.readline())
+    f.close()
+    snakes = newGeneration()
+    for i in range(0, POPULATION):
+        snakes[i].brain.readWeighs(i)
+
+    return snakes, generation
+
+
 def main():
+    draw = True
     pygame.init()
     window = initWindow()
     fps_timer = pygame.time.Clock()
     snakes = newGeneration()
     max_fps = 60
     generation = 1
-    draw = True
-    updateInfo(generation)
+    print(f"\nNew generation: {generation}")
+    updateInfo(generation, POPULATION)
 
     while True:
         # controls
@@ -46,31 +66,37 @@ def main():
                 elif event.key == K_RIGHT:
                     draw = False
                 elif event.key == K_s:
-                    snakes[0].brain.saveWeighs()
+                    saveGeneration(snakes, generation)
+                elif event.key == K_l:
+                    snakes, generation = loadGeneration()
+                    updateInfo(generation, POPULATION)
                 elif event.key == K_UP:
                     max_fps = 60
                 elif event.key == K_DOWN:
                     max_fps = 1000
 
         # game action
+        snakes_left = 0
         alive = None
         for snake in snakes:
             if snake.active == True:
                 snake.think()
                 snake.move()
+                snakes_left += 1
             if snake.active == True and alive == None:
                 alive = snake
 
         # new generation
         if alive == None:
             snakes = newGeneration(False, snakes)
-            updateInfo(generation)
+            print(f"\nNew generation: {generation}")
             generation += 1
             continue
 
         # drawing
         if draw:
             drawWindow(window, alive)
+            updateInfo(generation, snakes_left)
 
         fps_timer.tick(max_fps)
 

@@ -78,18 +78,18 @@ class NeuralNetwork:
             for i in range(partition1, np.size(b, 0)):
                 b[i] = otherb[i]
 
-    def saveWeighs(self):
+    def saveWeighs(self, number):
         for i in range(0, self.layersN - 1):
-            np.savetxt('models/weighs' + str(i) + '.csv',
+            np.savetxt('models/weighs' + str(i) + str(number) + '.csv',
                        self.weighs[i], delimiter=',')
-            np.savetxt('models/biases' + str(i) + '.csv',
+            np.savetxt('models/biases' + str(i) + str(number) + '.csv',
                        self.biases[i], delimiter=',')
 
-    def readWeighs(self):
+    def readWeighs(self, number):
         self.weighs = []
         self.biases = []
         for i in range(0, self.layersN - 1):
             self.weighs.append(np.loadtxt(
-                'models/weighs' + str(i) + '.csv', delimiter=','))
+                'models/weighs' + str(i) + str(number) + '.csv', delimiter=','))
             self.biases.append(np.loadtxt(
-                'models/biases' + str(i) + '.csv', delimiter=','))
+                'models/biases' + str(i) + str(number) + '.csv', delimiter=','))
