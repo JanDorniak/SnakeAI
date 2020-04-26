@@ -6,7 +6,7 @@ BOARD_COLOR = '#FFFFFF'
 SNAKE_COLOR = '#00FF00'
 APPLE_COLOR = "#FF0000"
 
-BOARD_SIZE = 480
+BOARD_SIZE = 600
 MARGIN_TOP = 10
 MARGIN_SIDES = 10
 MARGIN_DOWN = 10
@@ -25,7 +25,9 @@ BEST_N = 20
 
 # game settings
 SPEED = 3
-RADIUS = 15
+RADIUS = 24  # radius % speed must be 0
+THINK_LOCK = 15  # 15
+STEPS_WITHOUT_APPLE_MAX = 25  # 15
 
 
 # nn settings

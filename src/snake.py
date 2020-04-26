@@ -71,11 +71,11 @@ class Snake:
 
     def calcFitness(self):
         if self.apples_eaten < 10:
-            self.fitness = int(self.ticks_alive * self.ticks_alive *
-                               np.power(2, self.apples_eaten))
+            self.fitness = self.ticks_alive * self.ticks_alive * \
+                np.power(2, self.apples_eaten)
         else:
-            self.fitness = int(self.ticks_alive * self.ticks_alive *
-                               np.power(2, 10) * (self.apples_eaten - 9))
+            self.fitness = self.ticks_alive * self.ticks_alive * \
+                np.power(2, 10) * (self.apples_eaten - 9)
 
     def changeDir(self, dir):
         if dir.value == self.body[0].direction.value * (-1) or self.body[0].direction == dir:
@@ -116,7 +116,7 @@ class Snake:
             self.placeApple()
             self.steps_without_apple = 0
 
-        if self.steps_without_apple > 50:  # 15
+        if self.steps_without_apple > STEPS_WITHOUT_APPLE_MAX:  # 15
             self.active = False
 
     def think(self):
@@ -134,7 +134,7 @@ class Snake:
         elif decision == 3:
             self.changeDir(Direction.RIGHT)
 
-        self.think_lock = 10  # 15
+        self.think_lock = THINK_LOCK
 
     def checkSide(self, line, condition1, condition2, dist_value, dir=None):
         inputs = [0] * 3
