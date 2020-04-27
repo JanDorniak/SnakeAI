@@ -55,10 +55,18 @@ class Snake:
                            (int(self.apple.x), int(self.apple.y)), RADIUS)
 
     def placeApple(self):
-        self.apple.x = np.random.randint(
-            BOARD_LEFT + RADIUS, BOARD_RIGHT - RADIUS)
-        self.apple.y = np.random.randint(
-            BOARD_TOP + RADIUS, BOARD_DOWN - RADIUS)
+        good_position = False
+        while good_position == False:
+            self.apple.x = np.random.randint(
+                BOARD_LEFT + RADIUS, BOARD_RIGHT - RADIUS)
+            self.apple.y = np.random.randint(
+                BOARD_TOP + RADIUS, BOARD_DOWN - RADIUS)
+
+            good_position = True
+            for element in self.body:
+                if self.apple.calcDistance(element) < RADIUS:
+                    good_position = False
+                    break
 
     def addTail(self):
         self.apples_eaten += 1
@@ -70,12 +78,7 @@ class Snake:
         self.body.append(Element((x, y), dir))
 
     def calcFitness(self):
-        if self.apples_eaten < 10:
-            self.fitness = self.ticks_alive * self.ticks_alive * \
-                np.power(2, self.apples_eaten)
-        else:
-            self.fitness = self.ticks_alive * self.ticks_alive * \
-                np.power(2, 10) * (self.apples_eaten - 9)
+        self.fitness = self.ticks_alive * np.power(2, self.apples_eaten)
 
     def changeDir(self, dir):
         if dir.value == self.body[0].direction.value * (-1) or self.body[0].direction == dir:

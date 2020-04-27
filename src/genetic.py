@@ -2,6 +2,7 @@ import numpy as np
 from snake import Snake
 from neural import NeuralNetwork
 from settings import *
+from utils import *
 
 
 def selectBest(snakes):
@@ -20,9 +21,11 @@ def normalizeFitness(snakes):
         snake.fitness /= total
 
     print(f"Avg fitness: {total/POPULATION}")
+    saveAvgFitness(total/POPULATION)
 
 
 def pickParent(snakes):
+    parent = snakes[-1]
     r = np.random.uniform()
     sum = 0
     for i in range(0, POPULATION):

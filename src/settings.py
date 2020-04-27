@@ -20,14 +20,14 @@ BOARD_DOWN = MARGIN_TOP + BOARD_SIZE
 # genetic settings
 POPULATION = 600
 MUTATION_CHANCE = 0.10
-BEST_N = 20
+BEST_N = 10
 
 
 # game settings
 SPEED = 3
 RADIUS = 24  # radius % speed must be 0
 THINK_LOCK = 15  # 15
-STEPS_WITHOUT_APPLE_MAX = 25  # 15
+STEPS_WITHOUT_APPLE_MAX = 30  # 15
 
 
 # nn settings

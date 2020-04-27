@@ -25,17 +25,15 @@ def drawWindow(window, alive):
 
 
 def saveGeneration(snakes, generation):
-    f = open("models/generation.txt", "w")
-    f.write(f"{generation}")
-    f.close()
+    with open("models/generation.txt", "w") as f:
+        f.write(f"{generation}")
     for i in range(0, POPULATION):
         snakes[i].brain.saveWeighs(i)
 
 
 def loadGeneration():
-    f = open("models/generation.txt", "r")
-    generation = int(f.readline())
-    f.close()
+    with open("models/generation.txt", "r") as f:
+        generation = int(f.readline())
     snakes = newGeneration()
     for i in range(0, POPULATION):
         snakes[i].brain.readWeighs(i)

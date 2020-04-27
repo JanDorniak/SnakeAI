@@ -28,3 +28,8 @@ def checkDist(a, hx, hy, corx, cory):
         y = checkLRIntersect(hx, hy, a, corx)
 
     return np.sqrt((hx - x)**2 + (hy - y)**2)
+
+
+def saveAvgFitness(value):
+    with open("other/avgfitness.csv", "a") as file:
+        file.write(str(value) + ',')
